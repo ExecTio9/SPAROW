@@ -15,10 +15,12 @@ PWMServo servo;
 
 // Initialize PID algorithm
 double desired, input, output;
-double kp = 1.25, ki = 0.04, kd = 0.1;
+double kp = 0.5, ki = 0.5, kd = 0.5;
 PID pid(&input, &output, &desired, kp, ki, kd, DIRECT);
 
 const int initialServoValue = 90;
+
+int lastdata;
 
 void setup()
 {
@@ -77,7 +79,8 @@ void loop()
 
   // Get current degrees for Z axis
   int degreeZ = event.gyro.pitch;
-  input = abs(degreeZ);               // Calculate to absolute degrees
+  //input = abs(degreeZ);               // Calculate to absolute degrees 
+  input = degreeZ; 
   pid.Compute();                      // Get correction value for Z axis
 
   // Apply correction value for Z axis
@@ -87,7 +90,16 @@ void loop()
   } else {
     newZ = degreeZ - output;          // If gyro was moved clock-wise, subtract correction value
   }
-
+  //Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+  if((millis() - lastdata)> 500){
+  Serial.print("degreeZ: ");
+  Serial.println(degreeZ);
+  Serial.print("output: ");
+  Serial.println(output);
+  Serial.print("newZ: ");
+  Serial.println(newZ);
+  lastdata = millis();
+  }
   // Limit servo to min 0, or max 180 degrees
   if (newZ < -90) {
     newZ = -90;
