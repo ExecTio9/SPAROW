@@ -21,6 +21,10 @@ PID pid(&input, &output, &desired, kp, ki, kd, DIRECT);
 const int initialServoValue = 90;
 
 int lastdata;
+int lastVcal = 0;
+int degree1 = 0;
+int degree2;
+float rVelocityZ;
 
 void setup()
 {
@@ -63,12 +67,17 @@ void setup()
             eeAddress += sizeof(long);
             EEPROM.put(eeAddress, newCalib);
         }
+      
     }
 
     desired = 0;
     servo.attach(0);
     servo.write(initialServoValue);
     pid.SetMode(AUTOMATIC);
+
+  
+  // Get current degrees for Z axis
+  
 }
 
 void loop()
@@ -76,24 +85,25 @@ void loop()
   // Read gyro sensor data
   sensors_event_t event;
   bno.getEvent(&event);
-
   // Get current degrees for Z axis
-  int degreeZ = event.gyro.pitch;
-  //input = abs(degreeZ);               // Calculate to absolute degrees 
-  input = degreeZ; 
+  degree2 = event.gyro.pitch;
+  if((millis() - lastVcal)> 100){
+
+    rVelocityZ = (degree2-degree1)/0.1;
+    degree1 = degree2;
+    lastVcal = millis();
+  }
+  
+  input = rVelocityZ; 
   pid.Compute();                      // Get correction value for Z axis
 
   // Apply correction value for Z axis
   int newZ;
-  if (degreeZ < 0) {
-    newZ = degreeZ + output;          // If gyro was moved counter clock-wise, add correction value
-  } else {
-    newZ = degreeZ - output;          // If gyro was moved clock-wise, subtract correction value
-  }
+  newZ = output;
   //Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
   if((millis() - lastdata)> 500){
   Serial.print("degreeZ: ");
-  Serial.println(degreeZ);
+  Serial.println(rVelocityZ);
   Serial.print("output: ");
   Serial.println(output);
   Serial.print("newZ: ");
