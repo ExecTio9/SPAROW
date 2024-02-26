@@ -116,5 +116,5 @@ void loop()
   } else if (newZ > 90) {
     newZ = 90;
   }
-  servo.write(newZ + initialServoValue); // Add initialServoValue to make sure Servo is between 0 and 180
+  //servo.write(newZ + initialServoValue); // Add initialServoValue to make sure Servo is between 0 and 180
 }
