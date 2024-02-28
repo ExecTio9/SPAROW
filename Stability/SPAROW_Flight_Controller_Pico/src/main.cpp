@@ -112,10 +112,13 @@ void loop()
   newZ = PID_O_R;
   //Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
   if((millis() - lastdata)> 500){
+  printf("rVelocityZ: ,%f,\nPIDrate: ,%f,\n",rVelocityZ,PID_O_R)
+  /*
   Serial.print("rVelocityZ: ");
   Serial.println(rVelocityZ);
   Serial.print("PIDrate: ");
   Serial.println(PID_O_R);
+  */
   //Serial.print("newZ: ");
   //Serial.println(newZ);
   lastdata = millis();
