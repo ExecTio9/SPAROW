@@ -15,17 +15,20 @@ PWMServo servo;
 
 // Initialize PID algorithm
 double desired = 0;
-double input, output;
+double input, outputPID;
 double kp = 0.5, ki = 0.5, kd = 0.5;
-PID pid(&input, &output, &desired, kp, ki, kd, DIRECT);
+PID pid(&input, &outputPID, &desired, kp, ki, kd, DIRECT);
 
 const int initialServoValue = 90;
 
 int lastdata;
 int lastVcal = 0;
+int lastPID_O = 0;
 float degree1 = 0;
 float degree2;
 float rVelocityZ;
+float PID_O_1 = 0;
+float PID_O_R = 0;
 
 void setup()
 {
@@ -93,19 +96,26 @@ void loop()
     degree1 = degree2;
     lastVcal = millis();
   }
+
+  if((millis() - lastPID_O)> 100){
+    PID_O_R = (outputPID-PID_O_1)/0.1;
+    PID_O_1 = outputPID;
+    lastPID_O = millis();
+  }
   
   input = rVelocityZ; 
   pid.Compute();                      // Get correction value for Z axis
 
+
   // Apply correction value for Z axis
   int newZ;
-  newZ = output;
+  newZ = PID_O_R;
   //Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
   if((millis() - lastdata)> 500){
   Serial.print("rVelocityZ: ");
   Serial.println(rVelocityZ);
-  Serial.print("output: ");
-  Serial.println(output);
+  Serial.print("PIDrate: ");
+  Serial.println(PID_O_R);
   //Serial.print("newZ: ");
   //Serial.println(newZ);
   lastdata = millis();
