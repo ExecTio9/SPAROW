@@ -14,7 +14,8 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
 PWMServo servo;
 
 // Initialize PID algorithm
-double desired, input, output;
+double desired = 0;
+double input, output;
 double kp = 0.5, ki = 0.5, kd = 0.5;
 PID pid(&input, &output, &desired, kp, ki, kd, DIRECT);
 
@@ -22,8 +23,8 @@ const int initialServoValue = 90;
 
 int lastdata;
 int lastVcal = 0;
-int degree1 = 0;
-int degree2;
+float degree1 = 0;
+float degree2;
 float rVelocityZ;
 
 void setup()
@@ -70,7 +71,6 @@ void setup()
       
     }
 
-    desired = 0;
     servo.attach(0);
     servo.write(initialServoValue);
     pid.SetMode(AUTOMATIC);
@@ -102,12 +102,12 @@ void loop()
   newZ = output;
   //Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
   if((millis() - lastdata)> 500){
-  Serial.print("degreeZ: ");
+  Serial.print("rVelocityZ: ");
   Serial.println(rVelocityZ);
   Serial.print("output: ");
   Serial.println(output);
-  Serial.print("newZ: ");
-  Serial.println(newZ);
+  //Serial.print("newZ: ");
+  //Serial.println(newZ);
   lastdata = millis();
   }
   // Limit servo to min 0, or max 180 degrees
