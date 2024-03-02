@@ -94,17 +94,6 @@ void loop()
   imu::Vector<3> acc = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
   imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
 
-  if((millis() - lastVcal)> 100){
-    rVelocityZ = (degree2-degree1)/0.1;
-    degree1 = degree2;
-    lastVcal = millis();
-  }
-
-  if((millis() - lastPID_O)> 100){
-    PID_O_R = (outputPID-PID_O_1)/0.1;
-    PID_O_1 = outputPID;
-    lastPID_O = millis();
-  }
   pitchM = atan2(acc.x()/9.8, acc.z()/9.8)/2/3.141592654*360;
   rollM = atan2(acc.y()/9.8, acc.z()/9.8)/2/3.141592654*360;
 
@@ -114,10 +103,21 @@ void loop()
   pitch = (pitch-gyro.y()*dt)*0.98 + pitchM*0.02;
   roll = (roll+gyro.x()*dt)*0.98 + rollM*0.02;
 
+  if((millis() - lastVcal)> 100){               // Calculate Rotational Velocity on all axis
+    rVelocityZ = (degree2-degree1)/0.1;
+    degree1 = degree2;
+    lastVcal = millis();
+  }
+
+  // if((millis() - lastPID_O)> 100){
+  //   PID_O_R = (outputPID-PID_O_1)/0.1;
+  //   PID_O_1 = outputPID;
+  //   lastPID_O = millis();
+  // }
 
   // Apply correction value for Z axis
-  int newZ;
-  newZ = PID_O_R;
+  int ServoInputZ;
+  ServoInputZ = PID_O_R;
   //Serial.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
   if((millis() - lastdata)> 100){
   printf("rVelocityZ: ,%f,   PIDrate: ,%f,\n",rVelocityZ,PID_O_R);
@@ -132,10 +132,10 @@ void loop()
   lastdata = millis();
   }
   // Limit servo to min 0, or max 180 degrees
-  if (newZ < -90) {
-    newZ = -90;
-  } else if (newZ > 90) {
-    newZ = 90;
+  if (ServoInputZ < -90) {
+    ServoInputZ = -90;
+  } else if (ServoInputZ > 90) {
+    ServoInputZ = 90;
   }
   //servo.write(newZ + initialServoValue); // Add initialServoValue to make sure Servo is between 0 and 180
   delay(BNO055_SAMPLERATE_DELAY_MS);
