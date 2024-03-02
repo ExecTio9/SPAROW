@@ -16,7 +16,6 @@ const int initialServoValue = 100;
 #define BNO055_SAMPLERATE_DELAY_MS (100)
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
-<<<<<<< Updated upstream
 PWMServo servo;
 
 // Initialize PID algorithm
@@ -35,9 +34,7 @@ float degree2;
 float rVelocityZ;
 float PID_O_1 = 0;
 float PID_O_R = 0;
-=======
 PWMServo pitchServo;
->>>>>>> Stashed changes
 
 void setup()
 {
@@ -83,7 +80,6 @@ void setup()
   millisOld = millis();
   pitchServo.write(initialServoValue);
 
-<<<<<<< Updated upstream
     servo.attach(0);
     servo.write(initialServoValue);
     pid.SetMode(AUTOMATIC);
@@ -91,8 +87,6 @@ void setup()
   
   // Get current degrees for Z axis
   
-=======
->>>>>>> Stashed changes
 }
 
 void loop()
@@ -100,7 +94,7 @@ void loop()
   imu::Vector<3> acc = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
   imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
 
-<<<<<<< Updated upstream
+  if((millis() - lastVcal)> 100){
     rVelocityZ = (degree2-degree1)/0.1;
     degree1 = degree2;
     lastVcal = millis();
@@ -111,18 +105,15 @@ void loop()
     PID_O_1 = outputPID;
     lastPID_O = millis();
   }
-=======
   pitchM = atan2(acc.x()/9.8, acc.z()/9.8)/2/3.141592654*360;
   rollM = atan2(acc.y()/9.8, acc.z()/9.8)/2/3.141592654*360;
 
   dt = (millis()-millisOld)/1000.0;
   millisOld = millis();
->>>>>>> Stashed changes
   
   pitch = (pitch-gyro.y()*dt)*0.98 + pitchM*0.02;
   roll = (roll+gyro.x()*dt)*0.98 + rollM*0.02;
 
-<<<<<<< Updated upstream
 
   // Apply correction value for Z axis
   int newZ;
@@ -147,7 +138,5 @@ void loop()
     newZ = 90;
   }
   //servo.write(newZ + initialServoValue); // Add initialServoValue to make sure Servo is between 0 and 180
-=======
   delay(BNO055_SAMPLERATE_DELAY_MS);
->>>>>>> Stashed changes
 }
