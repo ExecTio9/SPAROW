@@ -17,22 +17,21 @@ float pitchM, rollM, pitch, roll, dt;
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
 
 
-// Initialize PID algorithm
+// Pitch PID loop
 double desired_Pitch = 0;
 double input_Pitch;
 double outputPID_Pitch;
 double kp_Pitch = 0.5, ki_Pitch = 0.5, kd_Pitch = 0.5;
 PID pidP(&input_Pitch, &outputPID_Pitch, &desired_Pitch, kp_Pitch, ki_Pitch, kd_Pitch, DIRECT);
 
+// Roll PID loop
 double desired_Roll = 0;
 double input_Roll;
 double outputPID_Roll;
 double kp_Roll = 0.5, ki_Roll = 0.5, kd_Roll = 0.5;
 PID pidR(&input_Roll, &outputPID_Roll, &desired_Roll, kp_Roll, ki_Roll, kd_Roll, DIRECT);
 
-const int initialServoPitchValue = 90;
-const int initialServoRollValue = 0;
-
+// Rotational Velocity
 int lastdata;
 int lastVcal = 0;
 int lastDegCal = 0;
@@ -42,14 +41,22 @@ float degree_Roll_1 = 0;
 float degree_Roll_2;
 float rVelocity_Pitch;
 float rVelocity_Roll;
-PWMServo pitchServo;
-PWMServo rollServo;
+
+// Looking at the back of the plane
+PWMServo leftAileron;
+PWMServo rightAileron;
+PWMServo leftElevator;
+PWMServo rightElevator;
+
 
 void setup()
 {
 
-  pitchServo.attach(0);
-  rollServo.attach(1);
+  leftAileron.attach(0);
+  rightAileron.attach(1);
+  leftElevator.attach(2);
+  rightElevator.attach(3);
+
   Serial.begin(115200);
   int eeAddress = 0;
   long bnoID;
@@ -90,8 +97,12 @@ void setup()
     
   }
   millisOld = millis();
-  pitchServo.write(initialServoPitchValue);
-  rollServo.write(initialServoRollValue);
+
+
+  leftAileron.write(0);
+  rightAileron.write(0);
+  leftElevator.write(0);
+  rightElevator.write(0);
 
     
   // Get current degrees for P axis
@@ -145,4 +156,10 @@ void loop()
     outputPID_Roll = 90;
   }
   //servo.write(ServoInputP); // Add initialServoValue to make sure Servo is between 0 and 180
+  
+  // leftAileron.write(outputPID_Roll);
+  // rightAileron.write(outputPID_Roll);
+  // leftElevator.write(outputPID_Pitch);
+  // rightElevator.write((outputPID_Pitch)*1);
+
 }
